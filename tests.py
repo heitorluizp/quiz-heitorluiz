@@ -1,6 +1,14 @@
 import pytest
 from model import Question
 
+# Fixture para criar uma questão com múltiplas escolhas
+@pytest.fixture
+def question_with_choices():
+    question = Question(title="Sample Question", max_selections=2)
+    question.add_choice("Option A", is_correct=True)
+    question.add_choice("Option B", is_correct=False)
+    question.add_choice("Option C", is_correct=True)
+    return question
 
 def test_create_question():
     question = Question(title='q1')
@@ -100,3 +108,13 @@ def test_generate_unique_choice_ids():
     question.add_choice("a")
     question.add_choice("b")
     assert question.choices[0].id != question.choices[1].id
+
+#Testes utilizando as fixtures    
+def test_select_correct_choices(question_with_choices):
+    correct_choices = [choice.id for choice in question_with_choices.choices if choice.is_correct]
+    selected = question_with_choices.select_choices(correct_choices)
+    assert selected == correct_choices
+
+def test_remove_all_choices_with_fixture(question_with_choices):
+    question_with_choices.remove_all_choices()
+    assert len(question_with_choices.choices) == 0    
